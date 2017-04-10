@@ -110,7 +110,7 @@ const reduceVarDecs = (newVars, oldVars = {}) => {
   }, oldVars);
 };
 
-export const parseTableau = (str) => {
+export const parseProgram = (str) => {
   const lines = str.split('\n');
   const obj = parseObjective(lines[0]);
   let constraints = [];
@@ -139,22 +139,21 @@ export const parseTableau = (str) => {
     vars: varDecs,
   }
 };
-export const isTableau = (str) => {
+export const isProgram = (str) => {
   try {
-    parseTableau(str);
+    parseProgram(str);
   } catch (e) {
     return false;
   }
   return true;
 };
 
-window.t = {
-  program: 'max z = x1 + 2x2\nx1 + x2 < 3\nx1, x2 unrestricted',
+window.p = {
   pats, exps,
   parseCoef, isCoef,
   parsePoly, isPoly,
   parseObjective, isObjective,
   parseConstraint, isConstraint,
   parseVarDec, isVarDec,
-  parseTableau, isTableau,
+  parseProgram, isProgram,
 };

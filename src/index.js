@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
-
-import { parseTableau, isTableau } from './tableau';
+import { parseProgram, isProgram } from './program';
 //import * as Tableau from './tableau';
 //import TableauView from './TableauView';
 import './index.css';
@@ -43,7 +42,7 @@ ProgramEditor.propTypes = {
   tableau: PropTypes.object.isRequired,
 };
 
-function reducer(state = {program: window.t.program}, action) {
+function reducer(state = {program: 'max z = x1 + 2x2\nx1 + x2 < 3\nx1, x2 unrestricted'}, action) {
   console.log(action);
   switch (action.type) {
   case 'CHANGE_PROGRAM':
@@ -82,7 +81,7 @@ ProgramEditor = connect(
 
 function mapStateToTableauViewProps(state) {
   return {
-    tableau: parseTableau(state.program),
+    program: parseProgram(state.program),
   };
 }
 let MyTableauView = connect(
