@@ -25,12 +25,13 @@ TableauView.propTypes = {
 };
 
 function mapStateToTableauViewProps(state) {
-  const program = parseProgram(state.program);
+  const program = state.editor.program;
   const stdProgram = standardizeProgram(program);
   const tableau = standardProgramToTableau(stdProgram);
+  console.log('----- state -----');
   console.log(state);
   return {
-    tableau: parseProgram(state.program)
+    tableau,
   };
 }
 TableauView = connect(

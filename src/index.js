@@ -3,36 +3,61 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { parseProgram, isProgram, programToString, standardizeProgram } from './program';
+import { parseProgram, programToString, standardizeProgram } from './program';
 import { TableauView } from './tableau';
 //import * as Tableau from './tableau';
 //import TableauView from './TableauView';
 import './index.css';
 
-let ProgramEditor = ({ program, onChange }) => {
+let ProgramEditor = ({ editor, onChange }) => {
   return (
-    <textarea
-      onChange={e => onChange(e.target.value)}
-      style={{
-        backgroundColor: isProgram(program) ? 'green' : 'red',
-        height: '8em',
-        width: '16em',
-      }}
-      value={program} />
+    <div className={'program-editor '+(editor.parseError?'in':'')+'valid'}>
+      <textarea
+        onChange={e => onChange(e.target.value)}
+        value={editor.text} />
+      <span className="error-message">
+        {editor.parseError ? editor.parseError : 'Program valid'}
+      </span>
+    </div>
   );
 };
 ProgramEditor.propTypes = {
-  program: PropTypes.string.isRequired,
+  editor: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired
 };
 
-function reducer(state = {program: 'max z = x1 + 2x2\nx1 + x2 <= 3\nx1, x2 non-negative'}, action) {
+const initialState = (() => {
+  const text = 'max z = x1 + 2x2\nx1 + x2 <= 3\nx1, x2 non-negative';
+  const program = parseProgram(text);
+  return {
+    editor: {
+      text,
+      program,
+      parseError: null,
+    },
+  };
+})();
+
+function reducer(state = initialState, action) {
+  console.log('----- action -----');
   console.log(action);
   switch (action.type) {
   case 'CHANGE_PROGRAM':
+    const text = action.text;
+    let parseError = null;
+    let program = null;
+    try {
+      program = parseProgram(text);
+    } catch (e) {
+      parseError = e.message;
+    }
     return {
       ...state,
-      program: action.text,
+      editor: {
+        text,
+        parseError,
+        program,
+      },
     };
 
   default:
@@ -47,7 +72,7 @@ const store = createStore(
 
 function mapStateToProgramEditorProps(state) {
   return {
-    program: state.program,
+    editor: state.editor,
   };
 }
 function mapDispatcherToProgramEditorProps(dispatch) {
@@ -75,8 +100,8 @@ const render = () => {
     <Provider store={store}>
       <div>
         <ProgramEditor />
-        <ProgramView program={parseProgram(store.getState().program)} />
-        <ProgramView program={standardizeProgram(parseProgram(store.getState().program))} />
+        <ProgramView program={store.getState().editor.program} />
+        <ProgramView program={standardizeProgram(store.getState().editor.program)} />
         <TableauView />
       </div>
     </Provider>,
