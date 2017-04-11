@@ -3,3 +3,18 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.program-editor textarea {
+	width: 250px;
+	height: 100px;
+	display: block;
+}
+.program-editor .error-message {
+	display: block;
+}
+.program-editor.valid .error-message {
+	color: green;
+}
+.program-editor.invalid .error-message {
+	color: red;
+}
