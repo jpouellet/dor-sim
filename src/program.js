@@ -1,3 +1,52 @@
+/*
+The program:
+
+max z = x1 + 2x2
+x1 + x2 <= 3
+x1, x2 non-negative
+
+is represented by the object:
+
+{
+  "obj": {
+    "minmax": "max",
+    "var": "z",
+    "exp": {
+      "x1": {
+        "num": 1,
+        "denom": 1
+      },
+      "x2": {
+        "num": 2,
+        "denom": 1
+      }
+    }
+  },
+  "cons": [
+    {
+      "exp": {
+        "x1": {
+          "num": 1,
+          "denom": 1
+        },
+        "x2": {
+          "num": 1,
+          "denom": 1
+        }
+      }
+      "rel": "<=",
+      "rhs": {
+        "num": 3,
+        "denom": 1
+      }
+    }
+  ],
+  "vars": {
+    "x1": "non-negative",
+    "x2": "non-negative"
+  }
+}*/
+
 let pats = {};
 pats.int = '-?\\d+';
 pats.float = '-?\\d*\\.\\d+';
@@ -14,7 +63,7 @@ pats.varDec = '('+pats.varNameList+')\\s*(<|<=|=|>=|>)\\s*('+pats.value+')';
 pats.captureNextTerm = '\\s*('+pats.plusMinus+')\\s*('+pats.coef+')\\s*('+pats.varName+')';
 pats.captureObjective = '(min|max)\\s*('+pats.varName+')\\s*=\\s*('+pats.poly+')';
 pats.captureConstraint = '('+pats.poly+')\\s*(<|<=|=|>=|>)\\s*('+pats.value+')';
-pats.captureVarDec = '('+pats.varNameList+')\\s+(unrestricted)';
+pats.captureVarDec = '('+pats.varNameList+')\\s+(unrestricted|non-negative)';
 Object.freeze(pats);
 
 // Caching all regexps. We only use a few, but it's simpler to just pre-compute all, and it pays off anyway.
@@ -78,7 +127,7 @@ export const isObjective = (str) => {
 
 export const parseConstraint = (str) => {
   const m = str.match(exps.captureConstraint.exact);
-  return {exp: m[1], rel: m[2], rhs: parseCoef(m[3])};
+  return {exp: parsePoly(m[1]), rel: m[2], rhs: parseCoef(m[3])};
 };
 export const isConstraint = (str) => {
   return exps.captureConstraint.exact.test(str);
@@ -146,6 +195,62 @@ export const isProgram = (str) => {
     return false;
   }
   return true;
+};
+
+export const standardizeProgram = (oldP) => {
+  var p = Object.assign({}, oldP, {cons: []});
+  const nextVar = (prefix) => {
+    for (let i = 1;; i++) {
+      var name = prefix+i;
+      if (p.vars[name] === undefined)
+        return name;
+    }
+  };
+  const registerVar = (name, restriction) => {
+    p.vars[name] = restriction;
+  };
+  oldP.cons.forEach((con) => {
+    p.cons.push((({rel, exp, rhs}) => {
+      switch (rel) {
+        case '<=':
+          const e = nextVar('e');
+          registerVar(e, 'non-negative');
+          return {exp: {...exp, [e]: {num: 1, denom: 1}}, rel: '=', rhs};
+        case '>=':
+          const s = nextVar('s');
+          registerVar(s, 'non-negative');
+          return {exp: {...exp, [s]: {num: 1, denom: 1}}, rel: '=', rhs};
+        case '=':
+          return {exp, rel, rhs};
+        case '<': case '>':
+          throw new Error("don't know how to standardize strictly-{less,greater} than constraints");
+        default:
+          throw new Error("unknown relation: "+rel);
+      }
+    })(con));
+  });
+  return p;
+};
+
+export const coefToString = ({num, denom}) => (
+  num + (denom !== 1 ? '/'+denom : '')
+);
+
+export const programToString = (p) => {
+  const vars = Object.keys(p.vars);//.sort();
+  console.log(p);
+  return [
+    p.obj.minmax+' '+p.obj.var+' = '+vars.filter(varName => p.obj.exp[varName]).map(varName => coefToString(p.obj.exp[varName])+varName).join(' + '),
+    ...p.cons.map((con) => (
+      vars.filter(varName => con.exp[varName])
+      .map(varName => coefToString(con.exp[varName])+varName)
+      .join(' + ')+' '+con.rel+' '+coefToString(con.rhs)
+    )),
+    ...Array.from(new Set(Object.values(p.vars))).map((restriction) => (
+      vars.filter(varName => p.vars[varName] === restriction)
+      .join(', ')+' '+restriction
+    )),
+  ].join('\n');
 };
 
 window.p = {

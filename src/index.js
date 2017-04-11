@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { parseProgram, isProgram } from './program';
+import { parseProgram, isProgram, programToString, standardizeProgram } from './program';
+import { TableauView } from './tableau';
 //import * as Tableau from './tableau';
 //import TableauView from './TableauView';
 import './index.css';
@@ -13,11 +14,11 @@ let ProgramEditor = ({ program, onChange }) => {
     <textarea
       onChange={e => onChange(e.target.value)}
       style={{
-        backgroundColor: isTableau(program) ? 'green' : 'red',
+        backgroundColor: isProgram(program) ? 'green' : 'red',
         height: '8em',
         width: '16em',
       }}
-    >{program}</textarea>
+      value={program} />
   );
 };
 ProgramEditor.propTypes = {
@@ -25,24 +26,7 @@ ProgramEditor.propTypes = {
   onChange: PropTypes.func.isRequired
 };
 
-const TableauView = ({ tableau }) => (
-  <table>
-    <thead>
-      <tr>
-        {Object.keys(tableau.vars).map(varName =>
-          <th key={varName}>{varName}</th>
-        )}
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-);
-ProgramEditor.propTypes = {
-  tableau: PropTypes.object.isRequired,
-};
-
-function reducer(state = {program: 'max z = x1 + 2x2\nx1 + x2 < 3\nx1, x2 unrestricted'}, action) {
+function reducer(state = {program: 'max z = x1 + 2x2\nx1 + x2 <= 3\nx1, x2 non-negative'}, action) {
   console.log(action);
   switch (action.type) {
   case 'CHANGE_PROGRAM':
@@ -79,22 +63,25 @@ ProgramEditor = connect(
   mapDispatcherToProgramEditorProps
 )(ProgramEditor);
 
-function mapStateToTableauViewProps(state) {
-  return {
-    program: parseProgram(state.program),
-  };
-}
-let MyTableauView = connect(
-  mapStateToTableauViewProps,
-  null,
-)(TableauView);
-
-ReactDOM.render(
-  <Provider store={store}>
-    <div>
-      <ProgramEditor />
-      <MyTableauView />
-    </div>
-  </Provider>,
-  document.getElementById('root')
+const ProgramView = ({program}) => (
+  <pre>{programToString(program)}</pre>
 );
+ProgramView.propTypes = {
+  program: PropTypes.object.isRequired,
+};
+
+const render = () => {
+  ReactDOM.render(
+    <Provider store={store}>
+      <div>
+        <ProgramEditor />
+        <ProgramView program={parseProgram(store.getState().program)} />
+        <ProgramView program={standardizeProgram(parseProgram(store.getState().program))} />
+        <TableauView />
+      </div>
+    </Provider>,
+    document.getElementById('root')
+  );
+};
+render();
+store.subscribe(render);
