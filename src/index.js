@@ -100,9 +100,15 @@ const render = () => {
     <Provider store={store}>
       <div>
         <ProgramEditor />
-        <ProgramView program={store.getState().editor.program} />
-        <ProgramView program={standardizeProgram(store.getState().editor.program)} />
-        <TableauView />
+        {store.getState().editor.program && (
+          <ProgramView program={store.getState().editor.program} />
+        )}
+        {store.getState().editor.program && (
+          <ProgramView program={standardizeProgram(store.getState().editor.program)} />
+        )}
+        {store.getState().editor.program && (
+          <TableauView />
+        )}
       </div>
     </Provider>,
     document.getElementById('root')

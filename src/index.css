@@ -18,3 +18,20 @@ body {
 .program-editor.invalid .error-message {
 	color: red;
 }
+
+.tableau {
+	border-collapse: collapse;
+	display: block;
+	margin: 10px;
+}
+.tableau thead {
+	border-bottom: 1px solid black;
+}
+.tableau td, .tableau th {
+	padding: 0px 4px;
+	text-align: center;
+	border-left: 1px solid black;
+}
+.tableau td:first-child, .tableau th:first-child {
+	border-left: 0px;
+}

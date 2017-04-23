@@ -78,19 +78,71 @@ const exps = Object.keys(pats).reduce((exps, name) => {
   };
 }, {});
 
+
+export const isCoef = (str) => {
+  return exps.coef.exact.test(str);
+};
 export const parseCoef = (str) => {
+  if (!isCoef(str))
+    throw new Error('Invalid coef: '+str);
   if (str === '')
     return {num: 1, denom: 1};
   if (str === '-')
     return {num: -1, denom: 1};
-  const [num=1, denom=1] = str.split('/');
+  const [num='1', denom='1'] = str.split('/');
   return {num: parseFloat(num), denom: parseFloat(denom)};
 };
-export const isCoef = (str) => {
-  return exps.coef.exact.test(str);
+const gcd = (a, b) => {
+  a = Math.abs(a);
+  b = Math.abs(b);
+  if (b > a) [a, b] = [b, a];
+  for (;;) {
+    if (b === 0)
+      return a;
+    a %= b;
+    if (a === 0)
+      return b;
+    b %= a;
+  }
 };
+export const coefReduce = (c) => {
+  if (c.num === 0)
+    return {num: 0, denom: 1};
+  if (Number.isInteger(c.num) && Number.isInteger(c.denom)) {
+    const div = gcd(c.num, c.denom);
+    return {num: c.num / div, denom: c.denom / div};
+  }
+  return {...c};
+};
+export const coefMult = (c1, c2) => (coefReduce({
+  num: c1.num * c2.num,
+  denom: c1.num * c2.num,
+}));
+export const coefDiv = (c1, c2) => (coefReduce({
+  num: c1.num * c2.denom,
+  denom: c1.num * c2.num,
+}));
+export const coefAdd = (c1, c2) => {
+  if (c1.denom === c2.denom)
+    return {num: c1.num + c2.num, denom: c1.denom};
+  return coefReduce({
+    num: c1.num * c2.denom + c2.num * c1.denom,
+    denom: c1.denom * c2.denom,
+  });
+};
+export const coefMultScalar = (c, s) => (coefReduce({
+  num: c.num * s,
+  denom: c.denom,
+}));
+export const coef = (n, d = 1) => (coefReduce({
+  num: n,
+  denom: d,
+}));
+
 
 export const parsePoly = (str) => {
+  if (!exps.poly.exact.test(str))
+    throw new Error('Invalid poly: '+str);
   let poly = {};
   str = '+'+str;
   do {
@@ -107,8 +159,6 @@ export const parsePoly = (str) => {
   return poly;
 };
 export const isPoly = (str) => {
-  if (!exps.poly.exact.test(str))
-    return false;
   try {
     parsePoly(str);
   } catch (e) {
@@ -119,6 +169,8 @@ export const isPoly = (str) => {
 
 export const parseObjective = (str) => {
   const m = str.match(exps.captureObjective.exact);
+  if (!m)
+    throw new Error('Invalid objective '+str);
   return {minmax: m[1], var: m[2], exp: parsePoly(m[3])};
 };
 export const isObjective = (str) => {
@@ -127,6 +179,8 @@ export const isObjective = (str) => {
 
 export const parseConstraint = (str) => {
   const m = str.match(exps.captureConstraint.exact);
+  if (!m)
+    throw new Error('Invalid constraint '+str);
   return {exp: parsePoly(m[1]), rel: m[2], rhs: parseCoef(m[3])};
 };
 export const isConstraint = (str) => {
@@ -135,6 +189,8 @@ export const isConstraint = (str) => {
 
 export const parseVarDec = (str) => {
   const m = str.match(exps.captureVarDec.exact);
+  if (!m)
+    throw new Error('Invalid variable declaration: '+str);
   const varList = m[1].split(',').map(name => name.trim());
   const decl = m[2];
   return varList.reduce((vars, newVar) => {
@@ -170,7 +226,7 @@ export const parseProgram = (str) => {
     else if (isVarDec(line))
       varDecs = reduceVarDecs(parseVarDec(line), varDecs);
     else
-      throw new Error('invalid line: '+line);
+      throw new Error('Invalid line: '+line);
   });
   const usedVars = new Set(...[obj.exp, ...constraints.map(c => c.exp)].map(Object.keys));
   const declaredVars = new Set(Object.keys(varDecs));
@@ -233,7 +289,8 @@ export const standardizeProgram = (oldP) => {
 };
 
 export const coefToString = ({num, denom}) => (
-  num + (denom !== 1 ? '/'+denom : '')
+  (denom === 1 ? (num === 1 ? '' : num === -1 ? '-' : num) : num) +
+  (denom !== 1 ? '/'+denom : '')
 );
 
 export const programToString = (p) => {
