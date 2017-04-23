@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { parseProgram, programToString, standardizeProgram } from './program';
+import { parseProgram, standardizeProgram, ProgramView } from './program';
 import { TableauView } from './tableau';
 //import * as Tableau from './tableau';
 //import TableauView from './TableauView';
 import './index.css';
+import '../node_modules/katex/dist/katex.css';
 
 let ProgramEditor = ({ editor, onChange }) => {
   return (
@@ -87,13 +88,6 @@ ProgramEditor = connect(
   mapStateToProgramEditorProps,
   mapDispatcherToProgramEditorProps
 )(ProgramEditor);
-
-const ProgramView = ({program}) => (
-  <pre>{programToString(program)}</pre>
-);
-ProgramView.propTypes = {
-  program: PropTypes.object.isRequired,
-};
 
 const render = () => {
   ReactDOM.render(

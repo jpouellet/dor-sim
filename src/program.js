@@ -1,3 +1,8 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { InlineMath } from 'react-katex';
+import { mapVars } from './tableau';
+
 /*
 The program:
 
@@ -318,4 +323,61 @@ window.p = {
   parseConstraint, isConstraint,
   parseVarDec, isVarDec,
   parseProgram, isProgram,
+};
+
+export const coefToTex = (coef) => {
+  return coefToString(coef);
+};
+const varSplitRe = new RegExp("^(.*)([0-9]*)$");
+export const varToTex = (name) => {
+  const m = varSplitRe.exec(name);
+  return m[1]+(m[2] ? '_{'+m[2]+'}' : '');
+};
+export const relToTex = (rel) => {
+  switch (rel) {
+    case '<':  return '\\le';
+    case '<=': return '\\leq';
+    case '=':  return '=';
+    case '>=': return '\\geq';
+    case '>':  return '\\gt';
+    default:   return rel;
+  }
+};
+
+export const ProgramView = ({program}) => {
+  const p = program;
+  const vars = Object.keys(p.vars);//.sort();
+  console.log(p);
+  return <div className="program">
+    <div className="obj">
+      <span className="minmax">{p.obj.minmax} </span><InlineMath>{
+        p.obj.var + ' = ' + mapVars(p.obj.exp, vars, (name, val) => (
+          coefToTex(val) + varToTex(name)
+        ), true).join(' + ')
+      }</InlineMath>
+    </div>
+    {p.cons.map((con, idx) => (
+      <div className="con" key={idx}>
+        <span className="subject-to">{idx === 0 ? 'subject to ' : ''}</span>
+        <InlineMath>{
+          mapVars(con.exp, vars, (name, val) => (
+            coefToTex(val) + varToTex(name)
+          ), true).join(' + ') +
+          ' '+relToTex(con.rel)+' '+coefToTex(con.rhs)
+        }</InlineMath>
+      </div>
+    ))}
+    {Array.from(new Set(Object.values(p.vars))).map((restriction) => (
+      <div className="vars" key={restriction}>
+        <InlineMath>{
+          vars.filter(
+            varName => p.vars[varName] === restriction
+          ).join(', ')
+        }</InlineMath> <span className="restriction">{restriction}</span>
+      </div>
+    ))}
+  </div>;
+};
+ProgramView.propTypes = {
+  program: PropTypes.object.isRequired,
 };

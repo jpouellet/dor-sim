@@ -35,3 +35,24 @@ body {
 .tableau td:first-child, .tableau th:first-child {
 	border-left: 0px;
 }
+
+.program {
+	display: inline-block;
+	border: 1px dashed black;
+	padding: 5px;
+	margin: 12px;
+}
+.program .obj {
+}
+.program .obj .minmax {
+}
+.program .con {
+}
+.program .con .subject-to {
+	display: none;
+/*	color: grey;*/
+}
+.program .vars {
+}
+.program .vars .restriction {
+}

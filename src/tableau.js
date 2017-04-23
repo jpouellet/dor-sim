@@ -113,12 +113,14 @@ const example_tableau = {
 };
 */
 
-const mapVars = (exp, vars, fn) => {
+export const mapVars = (exp, vars, fn, onlyDefined) => {
   let varList;
   if (Array.isArray(vars))
     varList = vars;
   else
     varList = Object.keys(vars);
+  if (onlyDefined)
+    varList = varList.filter(varName => exp[varName] !== undefined);
   return varList.map(varName => fn(varName, exp[varName]));
 };
 
