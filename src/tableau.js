@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InlineMath } from 'react-katex';
 import { connect } from 'react-redux';
 import { standardizeProgram, coef, coefMultScalar } from './program';
+import { varToTex, relToTex, coefToTex } from './fmt';
 
 /*
 const example_program = {
@@ -155,7 +157,7 @@ let TableauView = ({ tableau }) => (
     <thead>
       <tr>
         {tableau.vars.map(varName =>
-          <th key={varName}>{varName}</th>
+          <th key={varName}><InlineMath>{varToTex(varName)}</InlineMath></th>
         )}
       </tr>
     </thead>

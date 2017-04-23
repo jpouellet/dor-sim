@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { InlineMath } from 'react-katex';
 import { mapVars } from './tableau';
+import { varToTex, relToTex, coefToTex } from './fmt';
 
 /*
 The program:
@@ -293,28 +294,6 @@ export const standardizeProgram = (oldP) => {
   return p;
 };
 
-export const coefToString = ({num, denom}) => (
-  (denom === 1 ? (num === 1 ? '' : num === -1 ? '-' : num) : num) +
-  (denom !== 1 ? '/'+denom : '')
-);
-
-export const programToString = (p) => {
-  const vars = Object.keys(p.vars);//.sort();
-  console.log(p);
-  return [
-    p.obj.minmax+' '+p.obj.var+' = '+vars.filter(varName => p.obj.exp[varName]).map(varName => coefToString(p.obj.exp[varName])+varName).join(' + '),
-    ...p.cons.map((con) => (
-      vars.filter(varName => con.exp[varName])
-      .map(varName => coefToString(con.exp[varName])+varName)
-      .join(' + ')+' '+con.rel+' '+coefToString(con.rhs)
-    )),
-    ...Array.from(new Set(Object.values(p.vars))).map((restriction) => (
-      vars.filter(varName => p.vars[varName] === restriction)
-      .join(', ')+' '+restriction
-    )),
-  ].join('\n');
-};
-
 window.p = {
   pats, exps,
   parseCoef, isCoef,
@@ -323,25 +302,6 @@ window.p = {
   parseConstraint, isConstraint,
   parseVarDec, isVarDec,
   parseProgram, isProgram,
-};
-
-export const coefToTex = (coef) => {
-  return coefToString(coef);
-};
-const varSplitRe = new RegExp("^(.*)([0-9]*)$");
-export const varToTex = (name) => {
-  const m = varSplitRe.exec(name);
-  return m[1]+(m[2] ? '_{'+m[2]+'}' : '');
-};
-export const relToTex = (rel) => {
-  switch (rel) {
-    case '<':  return '\\le';
-    case '<=': return '\\leq';
-    case '=':  return '=';
-    case '>=': return '\\geq';
-    case '>':  return '\\gt';
-    default:   return rel;
-  }
 };
 
 export const ObjectiveView = ({obj, vars}) => {
