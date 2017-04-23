@@ -344,38 +344,71 @@ export const relToTex = (rel) => {
   }
 };
 
+export const ObjectiveView = ({obj, vars}) => {
+  const varList = vars || Object.keys(obj.exp);
+  return <div className="obj">
+    <span className="minmax">{obj.minmax} </span><InlineMath>{
+      obj.var + ' = ' + mapVars(obj.exp, varList, (name, val) => (
+        coefToTex(val) + varToTex(name)
+      ), true).join(' + ')
+    }</InlineMath>
+  </div>;
+};
+ObjectiveView.propTypes = {
+  obj: PropTypes.object.isRequired,
+  vars: PropTypes.array,
+};
+
+export const ConstraintView = ({con, vars}) => {
+  const varList = vars || Object.keys(con.exp);
+  return <div className="con">
+    <InlineMath>{
+      mapVars(con.exp, varList, (name, val) => (
+        coefToTex(val) + varToTex(name)
+      ), true).join(' + ') +
+      ' '+relToTex(con.rel)+' '+coefToTex(con.rhs)
+    }</InlineMath>
+  </div>
+};
+ConstraintView.propTypes = {
+  con: PropTypes.object.isRequired,
+  vars: PropTypes.array,
+};
+
+export const RestrictionsView = ({restrictions, vars}) => {
+  const varList = vars || Object.keys(restrictions);
+  return <div className="restrictions">
+    {Array.from(new Set(Object.values(restrictions))).map((restriction) => (
+      <div className="vars" key={restriction}>
+        <InlineMath>
+          {mapVars(restrictions, varList, (name, val) => varToTex(name), true).join(', ')}
+        </InlineMath>
+        <span className="restriction"> {restriction}</span>
+      </div>
+    ))}
+  </div>
+};
+RestrictionsView.propTypes = {
+  restrictions: PropTypes.object.isRequired,
+  vars: PropTypes.array,
+};
+
 export const ProgramView = ({program}) => {
   const p = program;
   const vars = Object.keys(p.vars);//.sort();
   console.log(p);
   return <div className="program">
-    <div className="obj">
-      <span className="minmax">{p.obj.minmax} </span><InlineMath>{
-        p.obj.var + ' = ' + mapVars(p.obj.exp, vars, (name, val) => (
-          coefToTex(val) + varToTex(name)
-        ), true).join(' + ')
-      }</InlineMath>
-    </div>
-    {p.cons.map((con, idx) => (
-      <div className="con" key={idx}>
-        <span className="subject-to">{idx === 0 ? 'subject to ' : ''}</span>
-        <InlineMath>{
-          mapVars(con.exp, vars, (name, val) => (
-            coefToTex(val) + varToTex(name)
-          ), true).join(' + ') +
-          ' '+relToTex(con.rel)+' '+coefToTex(con.rhs)
-        }</InlineMath>
-      </div>
-    ))}
-    {Array.from(new Set(Object.values(p.vars))).map((restriction) => (
-      <div className="vars" key={restriction}>
-        <InlineMath>{
-          vars.filter(
-            varName => p.vars[varName] === restriction
-          ).join(', ')
-        }</InlineMath> <span className="restriction">{restriction}</span>
-      </div>
-    ))}
+    <ObjectiveView
+      obj={p.obj}
+      vars={vars} />
+    <span className="subject-to">subject to </span>
+    {p.cons.map((con, idx) => <ConstraintView
+      key={idx}
+      con={con}
+      vars={vars} />)}
+    <RestrictionsView
+      restrictions={p.vars}
+      vars={vars} />
   </div>;
 };
 ProgramView.propTypes = {

@@ -46,13 +46,15 @@ body {
 }
 .program .obj .minmax {
 }
-.program .con {
-}
-.program .con .subject-to {
+.program .subject-to {
 	display: none;
 /*	color: grey;*/
 }
-.program .vars {
+.program .con {
 }
-.program .vars .restriction {
+.program .restrictions {
+}
+.program .restrictions .vars {
+}
+.program .restrictions .restrict {
 }
