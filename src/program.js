@@ -269,7 +269,10 @@ export const standardizeProgram = (oldP) => {
     }
   };
   const registerVar = (name, restriction) => {
-    p.vars[name] = restriction;
+    p.vars = {
+      ...p.vars,
+      [name]: restriction,
+    };
   };
   oldP.cons.forEach((con) => {
     p.cons.push((({rel, exp, rhs}) => {
@@ -302,6 +305,7 @@ window.p = {
   parseConstraint, isConstraint,
   parseVarDec, isVarDec,
   parseProgram, isProgram,
+  standardizeProgram,
 };
 
 export const ObjectiveView = ({obj, vars}) => {
