@@ -1,31 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
-import { Provider, connect } from 'react-redux';
-import { parseProgram, standardizeProgram, ProgramView } from './program';
+import { Provider } from 'react-redux';
+import { parseProgram, standardizeProgram, ProgramView, ProgramEditor } from './program';
 import { TableauView } from './tableau';
 //import * as Tableau from './tableau';
 //import TableauView from './TableauView';
 import './index.css';
 import '../node_modules/katex/dist/katex.css';
-
-let ProgramEditor = ({ editor, onChange }) => {
-  return (
-    <div className={'program-editor '+(editor.parseError?'in':'')+'valid'}>
-      <textarea
-        onChange={e => onChange(e.target.value)}
-        value={editor.text} />
-      <span className="error-message">
-        {editor.parseError ? editor.parseError : 'Program valid'}
-      </span>
-    </div>
-  );
-};
-ProgramEditor.propTypes = {
-  editor: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired
-};
 
 const initialState = (() => {
   const text = `max z = 60x1 + 30x2 + 20x3
@@ -75,24 +57,6 @@ const store = createStore(
   reducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
-
-function mapStateToProgramEditorProps(state) {
-  return {
-    editor: state.editor,
-  };
-}
-function mapDispatcherToProgramEditorProps(dispatch) {
-  return {
-    onChange: (text) => dispatch({
-      type: 'CHANGE_PROGRAM',
-      text,
-    })
-  };
-}
-ProgramEditor = connect(
-  mapStateToProgramEditorProps,
-  mapDispatcherToProgramEditorProps
-)(ProgramEditor);
 
 const render = () => {
   ReactDOM.render(

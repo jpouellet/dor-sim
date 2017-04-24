@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { InlineMath } from 'react-katex';
 import { varToTex, relToTex, coefToTex, mapVars, polyToTex } from './fmt';
@@ -374,3 +375,44 @@ export const ProgramView = ({program}) => {
 ProgramView.propTypes = {
   program: PropTypes.object.isRequired,
 };
+
+
+
+let ProgramEditor = ({ editor, onChange }) => {
+  return (
+    <div className={'program-editor '+(editor.parseError?'in':'')+'valid'}>
+      <textarea
+        onChange={e => onChange(e.target.value)}
+        value={editor.text} />
+      <span className="error-message">
+        {editor.parseError ? editor.parseError : 'Program valid'}
+      </span>
+    </div>
+  );
+};
+ProgramEditor.propTypes = {
+  editor: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired
+};
+
+function mapStateToProgramEditorProps(state) {
+  return {
+    editor: state.editor,
+  };
+}
+
+function mapDispatcherToProgramEditorProps(dispatch) {
+  return {
+    onChange: (text) => dispatch({
+      type: 'CHANGE_PROGRAM',
+      text,
+    })
+  };
+}
+
+ProgramEditor = connect(
+  mapStateToProgramEditorProps,
+  mapDispatcherToProgramEditorProps
+)(ProgramEditor);
+
+export {ProgramEditor};
