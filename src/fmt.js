@@ -32,13 +32,13 @@ export const coefToTex = ({num, denom}) => {
     return '-';
   if (denom === 1)
     return num+'';
-  return '\\frac{'+num+'}{'+denom+'}';
+  return `\\frac{${num}}{${denom}}`;
 };
 
 const varSplitRe = new RegExp("^(.*?)([0-9]*)$");
 export const varToTex = (name) => {
   const m = varSplitRe.exec(name);
-  return m[1]+(m[2] ? '_{'+m[2]+'}' : '');
+  return m[1]+(m[2] ? `_{${m[2]}}` : '');
 };
 
 export const relToTex = (rel) => {

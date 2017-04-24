@@ -130,7 +130,7 @@ const standardProgramToTableau = (p) => {
   // XXX vars restrictions?
   p.cons.forEach(con => {
     if(con.rel !== '=')
-      throw new Error('tableau not in standard form, found '+con.rel);
+      throw new Error(`tableau not in standard form, found: ${con.rel}`);
   });
   return {
     minmax: p.obj.minmax,

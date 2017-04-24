@@ -148,15 +148,15 @@ export const coef = (n, d = 1) => (coefReduce({
 
 export const parsePoly = (str) => {
   if (!exps.poly.exact.test(str))
-    throw new Error('Invalid poly: '+str);
+    throw new Error(`Invalid poly: ${str}`);
   let poly = {};
   str = '+'+str;
   do {
     const m = str.match(exps.captureNextTerm.beginning);
-    if (m === null) throw new Error('parsePoly error null');
-    if (m.index !== 0) throw new Error('parsePoly error no match');
+    if (m === null) throw new Error(`parsePoly error null: ${str}`);
+    if (m.index !== 0) throw new Error(`parsePoly error no match: ${str}`);
     const [, sign, coef, varName] = m;
-    if (poly[varName] !== undefined) throw new Error('parsePoly duplicate key');
+    if (poly[varName] !== undefined) throw new Error(`parsePoly duplicate key: ${varName}`);
     poly[varName] = parseCoef(coef);
     if (sign === '-')
       poly[varName].num *= -1;
@@ -176,7 +176,7 @@ export const isPoly = (str) => {
 export const parseObjective = (str) => {
   const m = str.match(exps.captureObjective.exact);
   if (!m)
-    throw new Error('Invalid objective '+str);
+    throw new Error(`Invalid objective: ${str}`);
   return {minmax: m[1], var: m[2], exp: parsePoly(m[3])};
 };
 export const isObjective = (str) => {
@@ -186,7 +186,7 @@ export const isObjective = (str) => {
 export const parseConstraint = (str) => {
   const m = str.match(exps.captureConstraint.exact);
   if (!m)
-    throw new Error('Invalid constraint '+str);
+    throw new Error(`Invalid constraint: ${str}`);
   return {exp: parsePoly(m[1]), rel: m[2], rhs: parseCoef(m[3])};
 };
 export const isConstraint = (str) => {
@@ -196,7 +196,7 @@ export const isConstraint = (str) => {
 export const parseVarDec = (str) => {
   const m = str.match(exps.captureVarDec.exact);
   if (!m)
-    throw new Error('Invalid variable declaration: '+str);
+    throw new Error(`Invalid variable declaration: ${str}`);
   const varList = m[1].split(',').map(name => name.trim());
   const decl = m[2];
   return varList.reduce((vars, newVar) => {
@@ -213,7 +213,7 @@ export const isVarDec = (str) => {
 const reduceVarDecs = (newVars, oldVars = {}) => {
   return Object.keys(newVars).reduce((allVars, next) => {
     if (allVars[next] !== undefined)
-      throw new Error('var '+next+' declared more than once');
+      throw new Error(`var ${next} declared more than once`);
     return {
       ...allVars,
       [next]: newVars[next]
@@ -232,17 +232,17 @@ export const parseProgram = (str) => {
     else if (isVarDec(line))
       varDecs = reduceVarDecs(parseVarDec(line), varDecs);
     else
-      throw new Error('Invalid line: '+line);
+      throw new Error(`Invalid line: ${line}`);
   });
   const usedVars = new Set(...[obj.exp, ...constraints.map(c => c.exp)].map(Object.keys));
   const declaredVars = new Set(Object.keys(varDecs));
   usedVars.forEach((used) => {
     if (!declaredVars.has(used))
-      throw new Error('used var '+used+' not declared');
+      throw new Error(`used var ${used} not declared`);
   });
   declaredVars.forEach((declared) => {
     if (!usedVars.has(declared))
-      throw new Error('declared var '+declared+' not used');
+      throw new Error(`declared var ${declared} not used`);
   });
   return {
     obj,
@@ -285,9 +285,9 @@ export const standardizeProgram = (oldP) => {
         case '=':
           return {exp, rel, rhs};
         case '<': case '>':
-          throw new Error("don't know how to standardize strictly-{less,greater} than constraints");
+          throw new Error(`don't know how to standardize '${rel}' constraints`);
         default:
-          throw new Error("unknown relation: "+rel);
+          throw new Error(`unknown relation: ${rel}`);
       }
     })(con));
   });
