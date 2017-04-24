@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { InlineMath } from 'react-katex';
-import { mapVars } from './tableau';
-import { varToTex, relToTex, coefToTex } from './fmt';
+import { varToTex, relToTex, coefToTex, mapVars, polyToTex } from './fmt';
 
 /*
 The program:
@@ -313,7 +312,7 @@ export const ObjectiveView = ({obj, vars}) => {
   return <div className="obj">
     <span className="minmax">{obj.minmax} </span><InlineMath>{
       obj.var + ' = ' + mapVars(obj.exp, varList, (name, val) => (
-        coefToTex(val) + varToTex(name)
+        coefToTex(val, true) + varToTex(name)
       ), true).join(' + ')
     }</InlineMath>
   </div>;
@@ -327,10 +326,7 @@ export const ConstraintView = ({con, vars}) => {
   const varList = vars || Object.keys(con.exp);
   return <div className="con">
     <InlineMath>{
-      mapVars(con.exp, varList, (name, val) => (
-        coefToTex(val) + varToTex(name)
-      ), true).join(' + ') +
-      ' '+relToTex(con.rel)+' '+coefToTex(con.rhs)
+      polyToTex(con.exp, varList)+' '+relToTex(con.rel)+' '+coefToTex(con.rhs)
     }</InlineMath>
   </div>
 };

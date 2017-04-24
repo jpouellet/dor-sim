@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { InlineMath } from 'react-katex';
 import { connect } from 'react-redux';
 import { standardizeProgram, coef, coefMultScalar } from './program';
-import { varToTex } from './fmt';
+import { varToTex, mapVars } from './fmt';
 
 /*
 const example_program = {
@@ -114,17 +114,6 @@ const example_tableau = {
   ]
 };
 */
-
-export const mapVars = (exp, vars, fn, onlyDefined) => {
-  let varList;
-  if (Array.isArray(vars))
-    varList = vars;
-  else
-    varList = Object.keys(vars);
-  if (onlyDefined)
-    varList = varList.filter(varName => exp[varName] !== undefined);
-  return varList.map(varName => fn(varName, exp[varName]));
-};
 
 const standardProgramToTableau = (p) => {
   // XXX vars restrictions?

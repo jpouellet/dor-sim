@@ -1,8 +1,21 @@
-export const coefToString = ({num, denom}) => {
-  if (num === 1 && denom === 1)
-    return '';
-  if (num === -1 && denom === 1)
-    return '-';
+export const mapVars = (exp, vars, fn, onlyDefined) => {
+  let varList;
+  if (Array.isArray(vars))
+    varList = vars;
+  else
+    varList = Object.keys(vars);
+  if (onlyDefined)
+    varList = varList.filter(varName => exp[varName] !== undefined);
+  return varList.map(varName => fn(varName, exp[varName]));
+};
+
+export const coefToString = ({num, denom}, collapseOne) => {
+  if (collapseOne) {
+    if (num === 1 && denom === 1)
+      return '';
+    if (num === -1 && denom === 1)
+      return '-';
+  }
   if (denom === 1)
     return num;
   return num+'/'+denom;
@@ -25,13 +38,15 @@ export const programToString = (p) => {
   ].join('\n');
 };
 
-export const coefToTex = ({num, denom}) => {
-  if (num === 1 && denom === 1)
-    return '';
-  if (num === -1 && denom === 1)
-    return '-';
+export const coefToTex = ({num, denom}, collapseOne) => {
+  if (collapseOne) {
+    if (num === 1 && denom === 1)
+      return '';
+    if (num === -1 && denom === 1)
+      return '-';
+  }
   if (denom === 1)
-    return num+'';
+    return num;
   return `\\frac{${num}}{${denom}}`;
 };
 
@@ -51,3 +66,12 @@ export const relToTex = (rel) => {
     default:   return rel;
   }
 };
+
+const polyToFormatted = (coefFmt, varFmt) => (exp, vars) => {
+  const varList = vars || Object.keys(exp);
+  return mapVars(exp, varList, (name, val) => (
+    coefFmt(val, true) + varFmt(name)
+  ), true).join(' + ');
+};
+export const polyToString = polyToFormatted(coefToString, varName => varName);
+export const polyToTex = polyToFormatted(coefToTex, varToTex);
