@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { InlineMath } from 'react-katex';
 import { connect } from 'react-redux';
 import { standardizeProgram, coef, coefMultScalar } from './program';
-import { varToTex, relToTex, coefToTex } from './fmt';
+import { varToTex } from './fmt';
 
 /*
 const example_program = {
