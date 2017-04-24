@@ -28,9 +28,12 @@ ProgramEditor.propTypes = {
 };
 
 const initialState = (() => {
-  const text = `max z = x1 + 2x2
-x1 + x2 <= 3
-x1, x2 non-negative`;
+  const text = `max z = 60x1 + 30x2 + 20x3
+8x1 + 6x2 + x3 <= 48
+4x1 + 2x2 + 3/2x3 <= 20
+2x1 + 3/2x2 + 1/2x3 <= 8
+x2 <= 5
+x1, x2, x3 non-negative`;
   const program = parseProgram(text);
   return {
     editor: {
