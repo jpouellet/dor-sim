@@ -1,0 +1,125 @@
+do_op(in) => {result: ..., steps: jsx}
+
+
+
+max z = 60x1 + 30x2 + 20x3
+8x1 + 6x2 + x3 <= 48
+4x1 + 2x2 + 3/2x3 <= 20
+2x1 + 3/2x2 + 1/2x3 <= 8
+x2 <= 5
+x1, x2, x3 non-negative
+
+First, we put the program into standard form.
+
+	To do this, we turn inequalities into equalities by adding excess variables:
+
+	so:
+	8x1 + 6x2 + x3 <= 48
+	4x1 + 2x2 + 3/2x3 <= 20
+	2x1 + 3/2x2 + 1/2x3 <= 8
+	x2 <= 5
+
+	becomes:
+	8x1 + 6x2 + x3 + e1 = 48
+	4x1 + 2x2 + 3/2x3 + e2 = 20
+	2x1 + 3/2x2 + 1/2x3 + e3 = 8
+	x2 + e4 = 5
+
+	resulting in the following new program:
+result	max z = 60x1 + 30x2 + 20x3
+	8x1 + 6x2 + x3 + e1 = 48
+	4x1 + 2x2 + 3/2x3 + e2 = 20
+	2x1 + 3/2x2 + 1/2x3 + e3 = 8
+	x2 + e4 = 5
+	x1, x2, x3 non-negative
+
+then, we turn it into a tableau:
+
+	Tableaus can only have constants on the right, so we must turn the objective function into a suitable equation:
+
+	so:
+	z = 60x1 + 30x2 + 20x3
+
+	becomes:
+	z - 60x1 - 30x2 - 20x3 = 0
+
+	resulting in the following tableau:
+	z	x1	x2	x3	e1	e2	e3	e4	rhs
+	1	-60	-30	-20	0	0	0	0	0
+	0	8	6	0	1	0	0	0	48
+	0	4	2	3/2	0	1	0	0	20
+	0	2	3/2	1/2	0	0	1	0	8
+	0	0	1	0	0	0	0	1	5
+
+and we optimize it:
+
+	iteration 1:
+		check if it's optimal: no
+			a max tableau is optimal when all reduced costs (row-0 values) are <= 0
+
+			The reduced cost / row-0 values are:
+				(z)	x1	x2	x3	e1	e2	e3	e4	(rhs)
+				(1)	-60	-30	-20	0	0	0	0	(0)
+
+			At least one of these is negative, so we are not done yet.
+
+		pick the entering variable: x1
+			since this is a max problem, we want to enter the column with the most negative reduced cost (value in row-0)
+
+			The reduced cost / row-0 values are:
+				(z)	x1	x2	x3	e1	e2	e3	e4	(rhs)
+				(1)	-60	-30	-20	0	0	0	0	(0)
+
+			The most negative is:
+				x1 with -60
+
+			So we are going to enter x1
+
+		find the leaving variable: e3
+			Now we find the corresponding leaving variable using the min ratio test.
+
+			For each row, we calculate the ratio of the value in the rhs column (the value of the basic variable) to the value in the column of the entering variable. If the denominator is <= 0, we set the ratio to infinity.
+
+			This results in the following ratios:
+			z	x1	x2	x3	e1	e2	e3	e4	rhs	(ratio)
+			1	-60	-30	-20	0	0	0	0	0
+			0	8	6	0	1	0	0	0	48	e1/x1 = 48/8 = 6
+			0	4	2	3/2	0	1	0	0	20	e2/x1 = 20/4 = 5
+			0	2	3/2	1/2	0	0	1	0	8	e3/x1 = 8/2 = 4
+			0	0	1	0	0	0	0	1	5	e4/x1 = 5/0 = infinity
+
+			the smallest of these values is 4 in row 3, so the corresponding basic variable of that row (e3) is the leaving variable
+
+		pivot to the next extreme point
+
+			we now perform a pivot operation
+
+			the pivot element is tableau cell of the entering column and leaving row:
+			z	x1	x2	x3	e1	e2	e3	e4	rhs
+			1	-60	-30	-20	0	0	0	0	0
+			0	8	6	0	1	0	0	0	48
+			0	4	2	3/2	0	1	0	0	20
+			0	(2)	3/2	1/2	0	0	1	0	8
+			0	0	1	0	0	0	0	1	5
+
+			we want the value of the pivot to be 1, and everything else in that column to be 0
+
+			since it is not already 1, we divide R3 by the vaue of the pivot element:
+			z	x1	x2	x3	e1	e2	e3	e4	rhs
+			1	-60	-30	-20	0	0	0	0	0
+			0	8	6	0	1	0	0	0	48
+			0	4	2	3/2	0	1	0	0	20
+			0	(1)	3/4	1/4	0	0	1/2	0	4
+			0	0	1	0	0	0	0	1	5
+
+			we need to make sure that the rhs values stay positive
+
+			we do this by performing only Rx = Rx +/- C * Ry operations
+
+			z	x1	x2	x3	e1	e2	e3	e4	rhs
+			1	-60	-30	-20	0	0	0	0	0
+			0	8	6	0	1	0	0	0	48
+			0	4	2	3/2	0	1	0	0	20
+			0	(1)	3/4	1/4	0	0	1/2	0	4
+			0	0	1	0	0	0	0	1	5
+
