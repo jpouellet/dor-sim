@@ -145,16 +145,22 @@ let TableauView = ({ tableau }) => (
   <table className="tableau">
     <thead>
       <tr>
+        <td key="minmax">{tableau.minmax}</td>
         {tableau.vars.map(varName =>
-          <th key={varName}><InlineMath>{varToTex(varName)}</InlineMath></th>
+          <th className="tableau-cell" key={varName}>
+            <InlineMath>{varToTex(varName)}</InlineMath>
+          </th>
         )}
       </tr>
     </thead>
     <tbody>
       {tableau.rows.map((row, idx) => (
         <tr key={idx}>
+          <td key="row-op"></td>
           {mapVars(row, tableau.vars, (name, val) =>
-            <td key={name}>{val.num}{val.denom !== 1 ? '/'+val.denom : ''}</td>
+            <td className="tableau-cell" key={name}>
+              {val.num}{val.denom !== 1 ? '/'+val.denom : ''}
+            </td>
           )}
         </tr>
       ))}
