@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { InlineMath } from 'react-katex';
 import { connect } from 'react-redux';
-import { standardizeProgram, coef, coefMultScalar } from './program';
 import { varToTex, mapVars } from './fmt';
+import { standardizeProgram, standardProgramToTableau } from './solver';
 
 /*
 const example_program = {
@@ -115,32 +115,6 @@ const example_tableau = {
 };
 */
 
-const standardProgramToTableau = (p) => {
-  // XXX vars restrictions?
-  p.cons.forEach(con => {
-    if(con.rel !== '=')
-      throw new Error(`tableau not in standard form, found: ${con.rel}`);
-  });
-  return {
-    minmax: p.obj.minmax,
-    vars: [p.obj.var, ...Object.keys(p.vars), 'rhs'],
-    rows: [
-      Object.assign({[p.obj.var]: coef(1), rhs: coef(0)},
-        ...mapVars(p.obj.exp, p.vars, (name, val) => ({
-          [name]: val ? coefMultScalar(val, -1) : coef(0),
-        }))
-      ),
-      ...p.cons.map(con => (
-        Object.assign({[p.obj.var]: coef(0), rhs: con.rhs},
-          ...mapVars(con.exp, p.vars, (name, val) => ({
-            [name]: val || coef(0),
-          }))
-        )
-      )),
-    ],
-  };
-};
-
 let TableauView = ({ tableau }) => (
   <table className="tableau">
     <thead>
@@ -173,8 +147,8 @@ TableauView.propTypes = {
 
 function mapStateToTableauViewProps(state) {
   const program = state.editor.program;
-  const stdProgram = standardizeProgram(program);
-  const tableau = standardProgramToTableau(stdProgram);
+  const stdProgram = standardizeProgram(program).result;
+  const tableau = standardProgramToTableau(stdProgram).result;
 
   return {
     tableau: tableau,

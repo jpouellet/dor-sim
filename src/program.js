@@ -259,44 +259,6 @@ export const isProgram = (str) => {
   return true;
 };
 
-export const standardizeProgram = (oldP) => {
-  var p = Object.assign({}, oldP, {cons: []});
-  const nextVar = (prefix) => {
-    for (let i = 1;; i++) {
-      var name = prefix+i;
-      if (p.vars[name] === undefined)
-        return name;
-    }
-  };
-  const registerVar = (name, restriction) => {
-    p.vars = {
-      ...p.vars,
-      [name]: restriction,
-    };
-  };
-  oldP.cons.forEach((con) => {
-    p.cons.push((({rel, exp, rhs}) => {
-      switch (rel) {
-        case '<=':
-          const e = nextVar('e');
-          registerVar(e, 'non-negative');
-          return {exp: {...exp, [e]: {num: 1, denom: 1}}, rel: '=', rhs};
-        case '>=':
-          const s = nextVar('s');
-          registerVar(s, 'non-negative');
-          return {exp: {...exp, [s]: {num: 1, denom: 1}}, rel: '=', rhs};
-        case '=':
-          return {exp, rel, rhs};
-        case '<': case '>':
-          throw new Error(`don't know how to standardize '${rel}' constraints`);
-        default:
-          throw new Error(`unknown relation: ${rel}`);
-      }
-    })(con));
-  });
-  return p;
-};
-
 window.p = {
   pats, exps,
   parseCoef, isCoef,
@@ -305,7 +267,6 @@ window.p = {
   parseConstraint, isConstraint,
   parseVarDec, isVarDec,
   parseProgram, isProgram,
-  standardizeProgram,
 };
 
 export const ObjectiveView = ({obj, vars}) => {

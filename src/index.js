@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { parseProgram, standardizeProgram, ProgramView, ProgramEditor } from './program';
+import { parseProgram, ProgramView, ProgramEditor } from './program';
 import { TableauView } from './tableau';
+import { standardizeProgram } from './solver';
 //import * as Tableau from './tableau';
 //import TableauView from './TableauView';
 import './index.css';
@@ -67,7 +68,7 @@ const render = () => {
           <ProgramView program={store.getState().editor.program} />
         )}
         {store.getState().editor.program && (
-          <ProgramView program={standardizeProgram(store.getState().editor.program)} />
+          <ProgramView program={standardizeProgram(store.getState().editor.program).result} />
         )}
         {store.getState().editor.program && (
           <TableauView />
