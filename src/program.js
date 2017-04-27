@@ -321,7 +321,7 @@ export const ProgramView = ({program}) => {
   const p = program;
   const vars = Object.keys(p.vars);//.sort();
   console.log(p);
-  return <div className="program">
+  return <div className="program"><div>
     <ObjectiveView
       obj={p.obj}
       vars={vars} />
@@ -333,7 +333,7 @@ export const ProgramView = ({program}) => {
     <RestrictionsView
       restrictions={p.vars}
       vars={vars} />
-  </div>;
+  </div></div>;
 };
 ProgramView.propTypes = {
   program: PropTypes.object.isRequired,
