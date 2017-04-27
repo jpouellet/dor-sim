@@ -31,13 +31,13 @@ footer {
 	display: block;
 	border: 1px solid black;
 	border-radius: 6px;
-	padding: 20px;
 	margin-bottom: 2em;
+}
+.ui-input > * {
+	margin: 20px;
 }
 .ui-input h3 {
 	font-weight: normal;
-	margin: 0px;
-	padding: 0px;
 }
 
 .step-list {

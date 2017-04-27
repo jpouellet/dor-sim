@@ -8,13 +8,29 @@ import { convertTo } from './solver';
 import './index.css';
 import '../node_modules/katex/dist/katex.css';
 
-const initialState = (() => {
-  const text = `max z = 60x1 + 30x2 + 20x3
+const defaultProgram = `max z = 60x1 + 30x2 + 20x3
 8x1 + 6x2 + x3 <= 48
 4x1 + 2x2 + 3/2x3 <= 20
 2x1 + 3/2x2 + 1/2x3 <= 8
 x2 <= 5
 x1, x2, x3 non-negative`;
+
+const hashLoadedProgram = (() => {
+  let hash = window.location.hash;
+
+  if (hash === '' || hash === '#')
+    return null;
+
+  if (hash.startsWith('#'))
+    hash = hash.substring(1);
+
+  return decodeURIComponent(hash);
+})();
+window.location.hash = '';
+history.replaceState('', document.title, window.location.pathname + window.location.search);
+
+const initialState = (() => {
+  const text = hashLoadedProgram || defaultProgram;
   const program = parseProgram(text);
   return {
     editor: {
@@ -87,8 +103,9 @@ const render = () => {
         <div className="ui-input">
           <h3>Input your program:</h3>
           <ProgramEditor />
+          <div>Shareable link to this program: <input type="text" value={window.location.href.split('#')[0]+'#'+encodeURIComponent(store.getState().editor.text)} /></div>
         </div>
-        <StepList className="ui-steps" goal="Optimize the tableau" steps={convertTo(store.getState().editor.program, 'tableau')} />
+        {store.getState().editor.program && <StepList className="ui-steps" goal="Optimize the tableau" steps={convertTo(store.getState().editor.program, 'tableau')} />}
       </div>
     </Provider>,
     document.getElementById('root')
