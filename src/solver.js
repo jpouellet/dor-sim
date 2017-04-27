@@ -1,5 +1,13 @@
+import React from 'react';
+import { InlineMath, BlockMath } from 'react-katex';
 import { coef, coefMultScalar } from './program';
-import { mapVars } from './fmt';
+import { mapVars, varToTex, coefToTex } from './fmt';
+import { TableauView } from './tableau';
+import { ProgramView } from './program';
+
+const MAX_ITER = 10; // XXX
+
+const How = (props) => <div style={{'borderLeft': '3px solid red'}}>{props.children}</div>;
 
 export const standardizeProgram = (oldP) => {
   var p = Object.assign({}, oldP, {cons: []});
@@ -37,9 +45,13 @@ export const standardizeProgram = (oldP) => {
     })(con));
   });
   return {
-    result: p,
+    result: {
+      ...p,
+      type: 'stdprogram',
+    },
     what: 'standardize program',
     how: 'by turning inequalities into equalities',
+    view: <ProgramView program={p} />,
   };
 };
 
@@ -68,16 +80,51 @@ export const standardProgramToTableau = (p) => {
     ],
   };
   return {
-    result: tableau,
-    what: 'convert to standard tableau',
+    result: {
+      ...tableau,
+      type: 'unknowntableau',
+    },
+    what: 'convert to tableau',
     how: 'by doing stuff',
+    view: <TableauView tableau={tableau} />
+  };
+};
+
+export const tableauIsOptimal = (t) => {
+  let varsOfInterest = {...t.rows[0]};
+  delete varsOfInterest[t.vars[0]];
+  delete varsOfInterest['rhs'];
+
+console.log(varsOfInterest);
+  const negatives = Object.values(varsOfInterest).filter(x => x.num < 0 && (x.num >= 0 ^ x.denom >= 0));
+  const isOptimal = negatives.length === 0;
+
+  return {
+    result: isOptimal,
+    what: 'Check if the tableau is optimal',
+    how: <How>
+      <div>A max tableau is optimal when all reduced costs (row-0 values) are <InlineMath>\geq 0</InlineMath>.</div>
+      <div>We take the row-0 values from the given tableau:</div>
+      <TableauView tableau={t} row={0} />
+      <div>Which gives us:
+        <BlockMath>{mapVars(varsOfInterest, t.vars, (name, val) => varToTex(name)+' = '+coefToTex(val), true).join(', ')}</BlockMath>
+      </div>
+      {isOptimal ? (
+        <div>All values are <InlineMath>\geq 0</InlineMath>, so the current tableau is optimal!</div>
+      ) : (
+        <div>We still have negative values (<InlineMath>{negatives.map(coefToTex).join(', ')}</InlineMath>), so we are not yet optimal.</div>
+      )}
+    </How>,
+    view: isOptimal ? 'Yes' : 'No',
   };
 };
 
 const conversions = [
   {from: 'program', to: 'stdprogram', cb: standardizeProgram},
-  {from: 'stdprogram', to: 'tableau', cb: standardProgramToTableau},
+  {from: 'stdprogram', to: 'unknowntableau', cb: standardProgramToTableau},
+  {from: 'unknowntableau', to: 'tableau', cb: tableauIsOptimal},
   {from: 'tableau', to: 'bfstableau', cb: (x) => ({result: x, what: 'nothing', how: 'assumed'})},
+  {from: 'bfstableau', to: 'optimaltableau', cb: (x) => ({result: x, what: 'nothing', how: 'assumed'})},
 ];
 
 export const reachableFrom = (now) => conversions.filter(c => c.from === now);
@@ -107,9 +154,20 @@ export const findConversionChain = (start, end) => {
   return _findConversionChain([reachableFrom(start)], end).map(x => x.cb);
 };
 
+export const convertTo = (obj, to) => {
+  let steps = [];
+  for (let count = 0; obj.type !== to && obj.type !== undefined && count < MAX_ITER; count++) {
+    const next = findConversionChain(obj.type, to)[0](obj);
+    steps.push(next);
+    obj = next.result;
+  }
+  return steps;
+};
+
 window.s = {
   conversions,
   reachableFrom,
   _findConversionChain,
   findConversionChain,
+  convertTo,
 };

@@ -2,11 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { parseProgram, ProgramView, ProgramEditor } from './program';
-import { TableauView } from './tableau';
-import { standardizeProgram } from './solver';
-//import * as Tableau from './tableau';
-//import TableauView from './TableauView';
+import { parseProgram, ProgramEditor } from './program';
+import { convertTo } from './solver';
 import './index.css';
 import '../node_modules/katex/dist/katex.css';
 
@@ -64,15 +61,11 @@ const render = () => {
     <Provider store={store}>
       <div>
         <ProgramEditor />
-        {store.getState().editor.program && (
-          <ProgramView program={store.getState().editor.program} />
-        )}
-        {store.getState().editor.program && (
-          <ProgramView program={standardizeProgram(store.getState().editor.program).result} />
-        )}
-        {store.getState().editor.program && (
-          <TableauView />
-        )}
+        {convertTo(store.getState().editor.program, 'tableau').map(({what, how, result, view}, idx) => (
+          <div key={idx}>{what}: {view}
+            {how}
+          </div>
+        ))}
       </div>
     </Provider>,
     document.getElementById('root')

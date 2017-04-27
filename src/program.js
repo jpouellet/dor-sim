@@ -1,6 +1,6 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { InlineMath } from 'react-katex';
 import { varToTex, relToTex, coefToTex, mapVars, polyToTex } from './fmt';
 
@@ -14,6 +14,7 @@ x1, x2 non-negative
 is represented by the object:
 
 {
+  "type": "program",
   "obj": {
     "minmax": "max",
     "var": "z",
@@ -245,6 +246,7 @@ export const parseProgram = (str) => {
       throw new Error(`declared var ${declared} not used`);
   });
   return {
+    type: 'program',
     obj,
     cons: constraints,
     vars: varDecs,

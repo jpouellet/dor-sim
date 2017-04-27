@@ -7,6 +7,7 @@ import { standardizeProgram, standardProgramToTableau } from './solver';
 
 /*
 const example_program = {
+  "type": "program",
   "obj": {
     "minmax": "max",
     "var": "z",
@@ -49,6 +50,7 @@ const example_program = {
 
 /*
 const example_tableau = {
+  "type": "tableau",
   "minmax": "max",
   "vars": [
     "z",
