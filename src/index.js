@@ -8,6 +8,9 @@ import { convertTo } from './solver';
 import './index.css';
 import '../node_modules/katex/dist/katex.css';
 
+const encodeProgramLink = btoa;
+const decodeProgramLink = atob;
+
 const defaultProgram = `max z = 60x1 + 30x2 + 20x3
 8x1 + 6x2 + x3 <= 48
 4x1 + 2x2 + 3/2x3 <= 20
@@ -24,7 +27,7 @@ const hashLoadedProgram = (() => {
   if (hash.startsWith('#'))
     hash = hash.substring(1);
 
-  return decodeURIComponent(hash);
+  return decodeProgramLink(hash);
 })();
 window.location.hash = '';
 history.replaceState('', document.title, window.location.pathname + window.location.search);
@@ -103,7 +106,7 @@ const render = () => {
         <div className="ui-input">
           <h3>Input your program:</h3>
           <ProgramEditor />
-          <div>Shareable link to this program: <input type="text" value={window.location.href.split('#')[0]+'#'+encodeURIComponent(store.getState().editor.text)} /></div>
+          <div>Shareable link to this program: <input type="text" value={window.location.href.split('#')[0]+'#'+encodeProgramLink(store.getState().editor.text)} /></div>
         </div>
         {store.getState().editor.program && <StepList className="ui-steps" goal="Optimize the tableau" steps={convertTo(store.getState().editor.program, 'tableau')} />}
       </div>
