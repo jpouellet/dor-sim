@@ -143,3 +143,5 @@ render();
 if (!CLEAN_WORKING_URL)
   saveStateToURL();
 store.subscribe(render);
+
+window.gs = store.getState; // XXX remove me!
