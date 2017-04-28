@@ -182,4 +182,7 @@ window.s = {
   _findConversionChain,
   findConversionChain,
   convertTo,
+
+  standardizeProgram,
+  standardProgramToTableau,
 };

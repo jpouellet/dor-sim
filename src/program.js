@@ -379,3 +379,14 @@ ProgramEditor = connect(
 )(ProgramEditor);
 
 export {ProgramEditor};
+
+window.p = {
+  isCoef,
+  parseCoef,
+  coefReduce,
+  coefMult,
+  coefDiv,
+  coefAdd,
+  coefMultScalar,
+  coef,
+};

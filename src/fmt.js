@@ -75,3 +75,15 @@ const polyToFormatted = (coefFmt, varFmt) => (exp, vars) => {
 };
 export const polyToString = polyToFormatted(coefToString, varName => varName);
 export const polyToTex = polyToFormatted(coefToTex, varToTex);
+
+window.f = {
+  mapVars,
+  coefToString,
+  programToString,
+  coefToTex,
+  varToTex,
+  relToTex,
+  polyToFormatted,
+  polyToString,
+  polyToTex,
+};
