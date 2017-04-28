@@ -34,6 +34,7 @@ footer {
 	margin-bottom: 2em;
 }
 .ui-input > * {
+	display: block;
 	margin: 20px;
 }
 .ui-input h3 {
