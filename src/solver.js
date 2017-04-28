@@ -123,7 +123,11 @@ console.log(varsOfInterest);
       <div>We take the row-0 values from the given tableau:</div>
       <TableauView tableau={t} row={0} />
       <div>Which gives us:
-        <BlockMath>{mapVars(varsOfInterest, t.vars, (name, val) => varToTex(name)+' = '+coefToTex(val), true).join(', ')}</BlockMath>
+        {mapVars(varsOfInterest, t.vars, (name, val) => (
+          <BlockMath key={name}>
+            {varToTex(name)+' = '+coefToTex(val)}
+          </BlockMath>
+        ), true, true)}
       </div>
       {isOptimal ? (
         <div>All values are <InlineMath>\geq 0</InlineMath>, so the current tableau is optimal!</div>
@@ -131,7 +135,7 @@ console.log(varsOfInterest);
         <div>We still have negative values (<InlineMath>{negatives.map(coefToTex).join(', ')}</InlineMath>), so we are not yet optimal.</div>
       )}
     </How>,
-    view: isOptimal ? 'Yes' : 'No',
+    view: isOptimal ? 'At optimal solution!' : 'Not yet optimal...',
   };
 };
 
