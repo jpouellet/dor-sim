@@ -8,6 +8,8 @@ import { convertTo } from './solver';
 import './index.css';
 import '../node_modules/katex/dist/katex.css';
 
+const CLEAN_WORKING_URL = false;
+
 const encodeProgramLink = btoa;
 const decodeProgramLink = atob;
 
@@ -29,8 +31,14 @@ const hashLoadedProgram = (() => {
 
   return decodeProgramLink(hash);
 })();
-window.location.hash = '';
-history.replaceState('', document.title, window.location.pathname + window.location.search);
+if (CLEAN_WORKING_URL) {
+  window.location.hash = '';
+  history.replaceState('', document.title, window.location.pathname + window.location.search);
+}
+
+const saveStateToURL = (text) => {
+  history.replaceState('', document.title, window.location.pathname + window.location.search + '#'+encodeProgramLink(text || store.getState().editor.text));
+};
 
 const initialState = (() => {
   const text = hashLoadedProgram || defaultProgram;
@@ -57,6 +65,8 @@ function reducer(state = initialState, action) {
     } catch (e) {
       parseError = e.message;
     }
+    if (!CLEAN_WORKING_URL)
+      saveStateToURL(text);
     return {
       ...state,
       editor: {
@@ -75,6 +85,11 @@ const store = createStore(
   reducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
+
+// Save the current state when we navigate away so we restore the same program when re-opening the window.
+window.onbeforeunload = function(e) {
+  saveStateToURL();
+};
 
 let Step = ({step: {what, how, result, view}}) => (
   <li className="step">{what}: {view}
@@ -115,4 +130,6 @@ const render = () => {
   );
 };
 render();
+if (!CLEAN_WORKING_URL)
+  saveStateToURL();
 store.subscribe(render);
