@@ -121,7 +121,7 @@ const render = () => {
         <div className="ui-input">
           <h3>Input your program:</h3>
           <ProgramEditor />
-          <div>Shareable link to this program: <input type="text" value={window.location.href.split('#')[0]+'#'+encodeProgramLink(store.getState().editor.text)} /></div>
+          <div>Shareable link to your program: <input type="text" value={window.location.href.split('#')[0]+'#'+encodeProgramLink(store.getState().editor.text)} /></div>
         </div>
         {store.getState().editor.program && <StepList className="ui-steps" goal="Optimize the tableau" steps={convertTo(store.getState().editor.program, 'tableau')} />}
       </div>
