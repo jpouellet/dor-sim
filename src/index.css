@@ -50,6 +50,10 @@ footer {
 	margin-left: 1.5em;
 }
 .step {
+	margin-top: 2em;
+}
+.step:first-child {
+	margin-top: 0px;
 }
 .step .how {
 	margin: 15px 0px;
