@@ -1,4 +1,4 @@
-export const mapVars = (exp, vars, fn, onlyDefined) => {
+export const mapVars = (exp, vars, fn, onlyDefined, nonZero) => {
   let varList;
   if (Array.isArray(vars))
     varList = vars;
@@ -6,6 +6,8 @@ export const mapVars = (exp, vars, fn, onlyDefined) => {
     varList = Object.keys(vars);
   if (onlyDefined)
     varList = varList.filter(varName => exp[varName] !== undefined);
+  if (nonZero)
+    varList = varList.filter(varName => exp[varName].num !== 0);
   return varList.map(varName => fn(varName, exp[varName]));
 };
 
