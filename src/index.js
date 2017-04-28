@@ -36,10 +36,6 @@ if (CLEAN_WORKING_URL) {
   history.replaceState('', document.title, window.location.pathname + window.location.search);
 }
 
-const saveStateToURL = (text) => {
-  history.replaceState('', document.title, window.location.pathname + window.location.search + '#'+encodeProgramLink(text || store.getState().editor.text));
-};
-
 const initialState = (() => {
   const text = hashLoadedProgram || defaultProgram;
   const program = parseProgram(text);
@@ -85,6 +81,10 @@ const store = createStore(
   reducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
+
+function saveStateToURL(text) {
+  history.replaceState('', document.title, window.location.pathname + window.location.search + '#'+encodeProgramLink(text || store.getState().editor.text));
+};
 
 // Save the current state when we navigate away so we restore the same program when re-opening the window.
 window.onbeforeunload = function(e) {
