@@ -7,7 +7,7 @@ import { TableauView } from './tableau';
 
 const MAX_ITER = 10; // XXX
 
-const How = (props) => <div style={{'borderLeft': '3px solid red'}}>{props.children}</div>;
+const How = (props) => <div>{props.children}</div>;
 
 export const standardizeProgram = (oldP) => {
   var p = Object.assign({}, oldP, {cons: []});
@@ -50,7 +50,7 @@ export const standardizeProgram = (oldP) => {
       type: 'stdprogram',
     },
     what: 'Convert to standard form',
-    how: <div>
+    how: <How>
       <p>To turn a program into standard form, we must turn all inequalities into equalities. This is accomplished by adding excess variables like so:</p>
 
       <ul>{p.cons.map((newCon, idx) => (
@@ -60,7 +60,7 @@ export const standardizeProgram = (oldP) => {
           <ConstraintView con={newCon} vars={Object.keys(p.vars)} />
         </li>
       ))}</ul>
-    </div>,
+    </How>,
     view: <ProgramView program={p} />,
   };
 };
@@ -95,13 +95,13 @@ export const standardProgramToTableau = (p) => {
       type: 'unknowntableau',
     },
     what: 'Represent the program with a tableau',
-    how: <div>
+    how: <How>
       <p> Tableaus can only have constants on the right, so we must first turn the objective function into a suitable equation.</p>
       <BlockMath>{varToTex(...p.obj.var)+' = '+polyToTex(p.obj.exp, p.vars, true)}</BlockMath>
       <p>becomes</p>
       <BlockMath>{polyToTex({...tableau.rows[0], z: coef(1)}, ['z', ...Object.keys(p.vars)], true)+' = 0'}</BlockMath>
       <p>which forms the top row of our tableau.</p>
-    </div>,
+    </How>,
     view: <TableauView tableau={tableau} />
   };
 };
