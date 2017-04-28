@@ -8,7 +8,7 @@ import { convertTo } from './solver';
 import './index.css';
 import '../node_modules/katex/dist/katex.css';
 
-const CLEAN_WORKING_URL = false;
+const CLEAN_WORKING_URL = window.location.origin !== 'http://localhost:3000';
 
 const encodeProgramLink = btoa;
 const decodeProgramLink = atob;
