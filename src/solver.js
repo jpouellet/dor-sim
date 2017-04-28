@@ -2,8 +2,8 @@ import React from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import { coef, coefMultScalar } from './program';
 import { mapVars, varToTex, coefToTex } from './fmt';
+import { ConstraintView, ProgramView } from './program';
 import { TableauView } from './tableau';
-import { ProgramView } from './program';
 
 const MAX_ITER = 10; // XXX
 
@@ -49,8 +49,18 @@ export const standardizeProgram = (oldP) => {
       ...p,
       type: 'stdprogram',
     },
-    what: 'standardize program',
-    how: 'by turning inequalities into equalities',
+    what: 'Convert to standard form',
+    how: <div>
+      <p>To turn a program into standard form, we must turn all inequalities into equalities. This is accomplished by adding excess variables like so:</p>
+
+      <ul>{p.cons.map((newCon, idx) => (
+        <li key={idx}>
+          <ConstraintView con={oldP.cons[idx]} vars={Object.keys(p.vars)} />
+          &nbsp;becomes&nbsp;
+          <ConstraintView con={newCon} vars={Object.keys(p.vars)} />
+        </li>
+      ))}</ul>
+    </div>,
     view: <ProgramView program={p} />,
   };
 };
