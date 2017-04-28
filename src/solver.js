@@ -1,7 +1,7 @@
 import React from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import { coef, coefMultScalar } from './program';
-import { mapVars, varToTex, coefToTex } from './fmt';
+import { mapVars, varToTex, coefToTex, polyToTex } from './fmt';
 import { ConstraintView, ProgramView } from './program';
 import { TableauView } from './tableau';
 
@@ -94,8 +94,14 @@ export const standardProgramToTableau = (p) => {
       ...tableau,
       type: 'unknowntableau',
     },
-    what: 'convert to tableau',
-    how: 'by doing stuff',
+    what: 'Represent the program with a tableau',
+    how: <div>
+      <p> Tableaus can only have constants on the right, so we must first turn the objective function into a suitable equation.</p>
+      <BlockMath>{varToTex(...p.obj.var)+' = '+polyToTex(p.obj.exp, p.vars, true)}</BlockMath>
+      <p>becomes</p>
+      <BlockMath>{polyToTex({...tableau.rows[0], z: coef(1)}, ['z', ...Object.keys(p.vars)], true)+' = 0'}</BlockMath>
+      <p>which forms the top row of our tableau.</p>
+    </div>,
     view: <TableauView tableau={tableau} />
   };
 };
