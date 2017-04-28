@@ -91,9 +91,11 @@ window.onbeforeunload = function(e) {
   saveStateToURL();
 };
 
-let Step = ({step: {what, how, result, view}}) => (
-  <li className="step">{what}: {view}
-    {how}
+let Step = ({step: {what, how, result, view, stepName}}) => (
+  <li className={"step "+stepName}><span style={{color: 'red'}}>({stepName})</span> {what}:
+    <div className="how">{how}</div>
+    Result:&nbsp;
+    {view}
   </li>
 );
 Step.propTypes = {

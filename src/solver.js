@@ -157,9 +157,11 @@ export const findConversionChain = (start, end) => {
 export const convertTo = (obj, to) => {
   let steps = [];
   for (let count = 0; obj.type !== to && obj.type !== undefined && count < MAX_ITER; count++) {
-    const next = findConversionChain(obj.type, to)[0](obj);
-    steps.push(next);
-    obj = next.result;
+    const callback = findConversionChain(obj.type, to)[0];
+    let nextStep = callback(obj);
+    nextStep.stepName = callback.name;
+    steps.push(nextStep);
+    obj = nextStep.result;
   }
   return steps;
 };

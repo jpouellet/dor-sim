@@ -51,6 +51,11 @@ footer {
 }
 .step {
 }
+.step .how {
+	margin: 15px 0px;
+	padding: 0px 15px;
+	border-left: 5px solid grey;
+}
 
 .program-editor textarea {
 	display: block;
@@ -112,4 +117,10 @@ footer {
 .program .restrictions .vars {
 }
 .program .restrictions .restrict {
+}
+
+
+
+.step.standardizeProgram .how .con {
+	display: inline;
 }
