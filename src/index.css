@@ -27,10 +27,13 @@ footer {
 	color: grey;
 }
 
-.ui-input {
+.ui-input, .ui-steps {
 	display: block;
 	border: 1px solid black;
 	border-radius: 6px;
+}
+
+.ui-input {
 	margin-bottom: 2em;
 }
 .ui-input > * {
@@ -41,11 +44,9 @@ footer {
 	font-weight: normal;
 }
 
-.step-list {
-	display: block;
-	border: 1px solid black;
-	border-radius: 6px;
+.ui-steps {
 }
+
 .step-list legend {
 	margin-left: 1.5em;
 }
@@ -58,7 +59,7 @@ footer {
 .step .how {
 	margin: 15px 0px;
 	padding: 0px 15px;
-	border-left: 5px solid grey;
+	border-left: 4px solid grey;
 }
 
 .program-editor textarea {
