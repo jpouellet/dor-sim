@@ -11,7 +11,7 @@ const MAX_ITER = 10; // XXX
 const How = (props) => <div>{props.children}</div>;
 
 export const Step = ({step: {what, how, result, view, stepName}}) => (
-  <li className={"step "+stepName}><span style={{color: 'red'}}>({stepName})</span> {what}:
+  <li className={"step "+stepName}><span className="step-fn">{stepName && `(${stepName})`}</span> {what}:
     {how && <div className="how">{how}</div>}
     {how && view && 'Result: '}
     {view}

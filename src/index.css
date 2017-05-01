@@ -62,6 +62,10 @@ footer {
 	border-left: 4px solid grey;
 }
 
+.step .step-fn {
+	color: red;
+}
+
 .program-editor textarea {
 	display: block;
 	box-sizing: border-box;
