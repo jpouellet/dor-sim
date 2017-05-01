@@ -110,7 +110,7 @@ const render = () => {
         </div>
         {store.getState().editor.program && <fieldset className="ui-steps">
           <legend>Find the optimal solution</legend>
-          <StepList steps={convertTo(store.getState().editor.program, 'solution')} />}
+          <StepList steps={convertTo(store.getState().editor.program, 'solution')} />
         </fieldset>}
       </div>
     </Provider>,
