@@ -6,7 +6,7 @@ import { mapVars, varToTex, coefToTex, polyToTex } from './fmt';
 import { coefCmp, coefNeg, coefRecip, polyMultCoef, polyAdd, ConstraintView, ProgramView } from './program';
 import { getBasicVars, getRatios, TableauView } from './tableau';
 
-const MAX_ITER = 10; // XXX
+const MAX_ITER = 100; // XXX
 
 const How = (props) => <div>{props.children}</div>;
 
