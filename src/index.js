@@ -108,10 +108,10 @@ const render = () => {
               readOnly />
           </label>
         </div>
-        <fieldset className="ui-steps">
+        {store.getState().editor.program && <fieldset className="ui-steps">
           <legend>Find the optimal solution</legend>
-          {store.getState().editor.program && <StepList steps={convertTo(store.getState().editor.program, 'solution')} />}
-        </fieldset>
+          <StepList steps={convertTo(store.getState().editor.program, 'solution')} />}
+        </fieldset>}
       </div>
     </Provider>,
     document.getElementById('root')
