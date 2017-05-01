@@ -390,9 +390,11 @@ export const readObjFn = (t) => {
     </How>,
     view: <div>
       <p>An optimal solution to the system is found with the following values:</p>
-      {getBasicVars(t).slice(1).map((varName, idx) => <BlockMath key={varName}>
-        {`${varToTex(varName)} = ${coefToTex(t.rows[idx]['rhs'])}`}
-      </BlockMath>)}
+      {[undefined, ...getBasicVars(t).slice(1)].map((varName, idx) =>
+        {varName && <BlockMath key={varName}>
+          {`${varToTex(varName)} = ${coefToTex(t.rows[idx]['rhs'])}`}
+        </BlockMath>}
+      )}
       <p>At an objective function value of <InlineMath>{coefToTex(t.rows[0]['rhs'])}</InlineMath>.</p>
     </div>
   };
