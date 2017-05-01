@@ -85,7 +85,6 @@ const exps = Object.keys(pats).reduce((exps, name) => {
   };
 }, {});
 
-
 export const isCoef = (str) => {
   return exps.coef.exact.test(str);
 };
@@ -125,6 +124,16 @@ export const coefMult = (c1, c2) => (coefReduce({
   num: c1.num * c2.num,
   denom: c1.denom * c2.denom,
 }));
+export const coefRecip = (c) => (
+  c.num < 0 ? {
+    num: c.denom * -1,
+    denom: c.num * -1,
+  } : {
+    num: c.denom,
+    denom: c.num,
+  }
+);
+export const coefDiv = (c1, c2) => coefReduce(coefMult(c1, coefRecip(c2)));
 export const coefAdd = (c1, c2) => {
   if (c1.denom === c2.denom)
     return {num: c1.num + c2.num, denom: c1.denom};
@@ -137,11 +146,23 @@ export const coefMultScalar = (c, s) => (coefReduce({
   num: c.num * s,
   denom: c.denom,
 }));
+export const coefNeg = (c) => coefMultScalar(c, -1);
+
 export const coef = (n, d = 1) => (coefReduce({
   num: n,
   denom: d,
 }));
+export const coefCmp = (a, b) => ((a.num / a.denom) - (b.num / b.denom));
 
+export const polyMultCoef = (p, c) => (
+  Object.assign({}, ...Object.keys(p).map(n => ({[n]: coefMult(p[n], c)})))
+);
+export const polyAdd = (p1, p2) => {
+  const keys = Array.from(new Set([...Object.keys(p1), ...Object.keys(p2)]));
+  const sums = keys.map(key => ({[key]: coefAdd(p1[key]||coef(0), p2[key]||coef(0))}));
+  const flattened = Object.assign({}, ...sums);
+  return flattened;
+};
 
 export const parsePoly = (str) => {
   if (!exps.poly.exact.test(str))
@@ -385,4 +406,7 @@ window.p = {
   coefAdd,
   coefMultScalar,
   coef,
+  coefCmp,
+  polyMultCoef,
+  polyAdd,
 };
