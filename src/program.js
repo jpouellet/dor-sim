@@ -245,8 +245,13 @@ export const parseProgram = (str) => {
   let constraints = [];
   let varDecs = [];
   lines.slice(1).forEach((line) => {
-    if (isConstraint(line))
-      constraints.push(parseConstraint(line));
+    if (isConstraint(line)) {
+      const con = parseConstraint(line);
+      // TODO support other constraint types
+      if (con.rel !== '<=')
+        throw new Error('Sorry, only <= constraints are supported at this time.');
+      constraints.push(con);
+    }
     else if (isVarDec(line))
       varDecs = reduceVarDecs(parseVarDec(line), varDecs);
     else
@@ -262,6 +267,10 @@ export const parseProgram = (str) => {
     if (!usedVars.has(declared))
       throw new Error(`declared var ${declared} not used`);
   });
+  if (obj.minmax !== 'max') {
+    // TODO support min problems
+    throw new Error('Sorry, only maximization problems are supported at this time.');
+  }
   return {
     type: 'program',
     obj,
