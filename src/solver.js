@@ -415,9 +415,9 @@ export const readObjFn = (t) => {
 
       <p>Recalling that our original objective function was:</p>
       <ObjectiveView className="final-obj-reading" obj={t.origObjFn} />
-      <p>Substituting our found optimal values, we obtain an objective value of:</p>
+      <p>we substitute our found optimal values to obtain the objective value:</p>
       <BlockMath>
-        {origVars.map(varName => `(${coefToTex(origExp[varName])})(${coefToTex(basicVal(varName))})`).join(' + ')+' = '+coefToTex(t.rows[0]['rhs'])}
+        {varToTex(t.origObjFn.var)+' = '+origVars.map(varName => `(${coefToTex(origExp[varName])})(${coefToTex(basicVal(varName))})`).join(' + ')+' = '+coefToTex(t.rows[0]['rhs'])}
       </BlockMath>
     </div>
   };
