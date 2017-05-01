@@ -266,16 +266,18 @@ export const findLeavingVariable = (t) => {
 
   const isUnbounded = false; /* XXX: detect & handle unbounded! */
 
+  const leaving = {
+    ...t,
+    leavingVar,
+    leavingRowNum,
+    type: 'leavingtableau',
+  };
+
   return {
     result: isUnbounded ? {
       ...removeProps(t, 'enteringVar'),
       type: 'unboundedtableau',
-    } : {
-      ...t,
-      leavingVar,
-      leavingRowNum,
-      type: 'leavingtableau',
-    },
+    } : leaving,
     what: 'Find the leaving variable',
     how: <How>
       <p>To find the leaving variable, we perform the min-ratio test.</p>
@@ -300,7 +302,7 @@ export const findLeavingVariable = (t) => {
       ))}
 
       <p>We keep track of these values in our tableau like so:</p>
-      <TableauView tableau={t} />
+      <TableauView tableau={leaving} showRatios={true} />
 
       <p>The smallest of these values is <InlineMath>{coefToTex(minRatio)}</InlineMath> in the row of basic variable <InlineMath>{varToTex(leavingVar)}</InlineMath>, so <InlineMath>{varToTex(leavingVar)}</InlineMath> is selected to be the leaving variable.</p>
     </How>,

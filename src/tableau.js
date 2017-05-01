@@ -161,7 +161,7 @@ export const TableauView = (props) => {
   const tableau = props.tableau;
   const selectedCol = props.col !== undefined ? props.col : tableau.enteringVar;
   const selectedRow = props.row !== undefined ? props.row : tableau.leavingRowNum;
-  const showRatios = false;//tableau.enteringVar !== undefined && tableau.leavingRowNum === undefined;
+  const showRatios = props.showRatios !== undefined;
   const showBasics = showRatios;
   const ops = tableau.ops;
 
