@@ -51,6 +51,20 @@ const example_program = {
 const example_tableau = {
   "type": "tableau",
   "minmax": "max",
+  "origObjFn": {
+    "minmax": "max",
+    "var": "z",
+    "exp": {
+      "x1": {
+        "num": 1,
+        "denom": 1
+      },
+      "x2": {
+        "num": 2,
+        "denom": 1
+      }
+    }
+  },
   "vars": [
     "z",
     "x1",

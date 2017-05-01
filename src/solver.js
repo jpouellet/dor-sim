@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { InlineMath, BlockMath } from 'react-katex';
-import { coef, coefMultScalar } from './program';
+import { coef, coefMultScalar, ObjectiveView } from './program';
 import { mapVars, varToTex, coefToTex, polyToTex } from './fmt';
 import { coefCmp, coefNeg, coefRecip, polyMultCoef, polyAdd, ConstraintView, ProgramView } from './program';
 import { getBasicVars, getRatios, TableauView } from './tableau';
@@ -97,6 +97,7 @@ export const standardProgramToTableau = (p) => {
   const tableau = {
     minmax: p.obj.minmax,
     vars: [p.obj.var, ...Object.keys(p.vars), 'rhs'],
+    origObjFn: p.obj,
     rows: [
       Object.assign({[p.obj.var]: coef(1), rhs: coef(0)},
         ...mapVars(p.obj.exp, p.vars, (name, val) => ({
@@ -380,6 +381,17 @@ export const simplexIteration = (t) => {
 };
 
 export const readObjFn = (t) => {
+  const basics = getBasicVars(t);
+  const origExp = t.origObjFn.exp;
+  const origVars = Object.keys(t.origObjFn.exp);
+
+  const basicVal = (varName) => {
+    const row = basics.findIndex(name => name === varName);
+    if (row === -1)
+      return coef(0);
+    return t.rows[row]['rhs'];
+  };
+
   return {
     result: {
       type: 'solution',
@@ -390,12 +402,21 @@ export const readObjFn = (t) => {
     </How>,
     view: <div>
       <p>An optimal solution to the system is found with the following values:</p>
-      {[undefined, ...getBasicVars(t).slice(1)].map((varName, idx) =>
-        {varName && <BlockMath key={varName}>
+      {basics.map((varName, idx) => ({
+        varName: varName,
+        block: <BlockMath key={varName}>
           {`${varToTex(varName)} = ${coefToTex(t.rows[idx]['rhs'])}`}
-        </BlockMath>}
-      )}
-      <p>At an objective function value of <InlineMath>{coefToTex(t.rows[0]['rhs'])}</InlineMath>.</p>
+        </BlockMath>
+      })).filter(({varName, block}) => (
+        Object.keys(t.origObjFn.exp).includes(varName)
+      )).map(({varName, block}) => block)}
+
+      <p>Recalling that our original objective function was:</p>
+      <ObjectiveView className="final-obj-reading" obj={t.origObjFn} />
+      <p>Substituting our found optimal values, we obtain an objective value of:</p>
+      <BlockMath>
+        {origVars.map(varName => `(${coefToTex(origExp[varName])})(${coefToTex(basicVal(varName))})`).join(' + ')+' = '+coefToTex(t.rows[0]['rhs'])}
+      </BlockMath>
     </div>
   };
 };

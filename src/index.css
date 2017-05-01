@@ -138,8 +138,14 @@ footer {
 .program .restrictions .restrict {
 }
 
-
-
 .step.standardizeProgram .how .con {
 	display: inline;
+}
+
+.final-obj-reading {
+	display: block;
+	text-align: center;
+}
+.final-obj-reading .minmax {
+	display: none;
 }

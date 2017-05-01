@@ -297,9 +297,9 @@ window.p = {
   parseProgram, isProgram,
 };
 
-export const ObjectiveView = ({obj, vars}) => {
+export const ObjectiveView = ({obj, vars, className}) => {
   const varList = vars || Object.keys(obj.exp);
-  return <div className="obj">
+  return <div className={'obj '+className}>
     <span className="minmax">{obj.minmax} </span><InlineMath>{
       obj.var + ' = ' + mapVars(obj.exp, varList, (name, val) => (
         coefToTex(val, true) + varToTex(name)
