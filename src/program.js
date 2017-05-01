@@ -123,11 +123,7 @@ export const coefReduce = (c) => {
 };
 export const coefMult = (c1, c2) => (coefReduce({
   num: c1.num * c2.num,
-  denom: c1.num * c2.num,
-}));
-export const coefDiv = (c1, c2) => (coefReduce({
-  num: c1.num * c2.denom,
-  denom: c1.num * c2.num,
+  denom: c1.denom * c2.denom,
 }));
 export const coefAdd = (c1, c2) => {
   if (c1.denom === c2.denom)
