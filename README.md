@@ -66,6 +66,8 @@ To share a program, simply copy the link provided below the program input box. T
 
 It would likely be prohibitively expensive in terms of the instructor's time to produce full work for every example, but if it is automatically generated on the fly, you can see infinite examples fully and correctly worked out, without ever having to go to a TA.
 
+For example, the link for the default example program loaded when you first visit the page is <http://dor.jpo.me/#bWF4IHogPSA2MHgxICsgMzB4MiArIDIweDMKOHgxICsgNngyICsgeDMgPD0gNDgKNHgxICsgMngyICsgMy8yeDMgPD0gMjAKMngxICsgMy8yeDIgKyAxLzJ4MyA8PSA4CngyIDw9IDUKeDEsIHgyLCB4MyBub24tbmVnYXRpdmU=>.
+
 ## Implementation notes
 
 ### Solver
