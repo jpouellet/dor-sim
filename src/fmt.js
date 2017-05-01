@@ -18,6 +18,10 @@ export const coefToString = ({num, denom}, collapseOne) => {
     if (num === -1 && denom === 1)
       return '-';
   }
+  if (num === Infinity)
+    return '∞';
+  if (num === -Infinity)
+    return '-∞';
   if (denom === 1)
     return num;
   return num+'/'+denom;
@@ -47,8 +51,12 @@ export const coefToTex = ({num, denom}, collapse) => {
     if (num === -1 && denom === 1)
       return '-';
   }
+  if (num === Infinity)
+    return '\\infty';
+  if (num === -Infinity)
+    return '-\\infty';
   if (denom === 1)
-    return num;
+    return num+'';
   return `\\frac{${num}}{${denom}}`;
 };
 
