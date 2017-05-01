@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { InlineMath } from 'react-katex';
-import { connect } from 'react-redux';
-import { varToTex, mapVars } from './fmt';
-import { standardizeProgram, standardProgramToTableau } from './solver';
+import { varToTex, mapVars, coefToString } from './fmt';
+import { coef, coefCmp, coefDiv } from './program';
 
 /*
 const example_program = {
@@ -117,48 +116,83 @@ const example_tableau = {
 };
 */
 
-let TableauView = ({ tableau }) => (
-  <table className="tableau">
+export const getBasicVars = (t) => (
+  // for each row:
+  t.rows.map((row, rowIdx) => (
+    // find the (non-rhs) var where:
+    t.vars.filter(x => x !== 'rhs').find(varName => {
+      // this row is a 1
+      const thisIsOne = coefCmp(row[varName], coef(1)) === 0;
+      // all other rows...
+      const otherRows = [...t.rows.slice(0, rowIdx), ...t.rows.slice(rowIdx+1)];
+      const othersAreZero = otherRows.every(zeroRow => (
+        // ...are zeroes
+        coefCmp(zeroRow[varName], coef(0)) === 0
+      ));
+      return thisIsOne && othersAreZero;
+    })
+  ))
+);
+
+export const getRatios = (t, enteringVarName) => (
+  t.rows.map(row => {
+    const ec /* entering column */ = row[enteringVarName];
+    if (coefCmp(ec, coef(0)) <= 0)
+      return coef(Infinity);
+    return coefDiv(row['rhs'], ec);
+  })
+);
+
+export const TableauView = (props) => {
+  const tableau = props.tableau;
+  const selectedCol = props.col !== undefined ? props.col : tableau.enteringVar;
+  const selectedRow = props.row !== undefined ? props.row : tableau.leavingRowNum;
+  const showRatios = false;//tableau.enteringVar !== undefined && tableau.leavingRowNum === undefined;
+  const showBasics = showRatios;
+  const ops = tableau.ops;
+
+  let basics, ratios;
+  if (showBasics)
+    basics = getBasicVars(tableau);
+  if (showRatios)
+    ratios = getRatios(tableau, tableau.enteringVar);
+
+  return <table className="tableau">
     <thead>
       <tr>
-        <td key="minmax">{tableau.minmax}</td>
-        {tableau.vars.map(varName =>
-          <th className="tableau-cell" key={varName}>
-            <InlineMath>{varToTex(varName)}</InlineMath>
+        <td key=":minmax">{tableau.minmax}</td>
+        {tableau.vars.map(name =>
+          <th className={'tableau-cell'+(name === selectedCol ? ' col-selected' : '')} key={name}>
+            <InlineMath>{varToTex(name)}</InlineMath>
           </th>
         )}
+        {showBasics && <th key=":basic var">Basic var</th>}
+        {showRatios && <th key=":ratio">Ratio</th>}
       </tr>
     </thead>
     <tbody>
       {tableau.rows.map((row, idx) => (
-        <tr key={idx}>
-          <td key="row-op"></td>
+        <tr key={idx} className={idx === selectedRow ? 'row-selected' : ''}>
+          <td key=":row-op">{ops && ops[idx] && `R${idx} <= R${idx} + ${coefToString(ops[idx].scale)} * R${ops[idx].row}`}</td>
           {mapVars(row, tableau.vars, (name, val) =>
-            <td className="tableau-cell" key={name}>
-              {val.num}{val.denom !== 1 ? '/'+val.denom : ''}
+            <td className={'tableau-cell'+(name === selectedCol ? ' col-selected' : '')} key={name}>
+              {coefToString(val)}
             </td>
           )}
+          {showBasics && <td key=":basic var">{basics[idx]}</td>}
+          {showRatios && <td key=":ratio">{coefToString(ratios[idx])}</td>}
         </tr>
       ))}
     </tbody>
   </table>
-);
+};
 TableauView.propTypes = {
   tableau: PropTypes.object.isRequired,
+  col: PropTypes.string,
+  row: PropTypes.number,
 };
 
-function mapStateToTableauViewProps(state) {
-  const program = state.editor.program;
-  const stdProgram = standardizeProgram(program).result;
-  const tableau = standardProgramToTableau(stdProgram).result;
-
-  return {
-    tableau: tableau,
-  };
-}
-TableauView = connect(
-  mapStateToTableauViewProps,
-  null,
-)(TableauView);
-
-export { TableauView };
+window.t = {
+  getBasicVars,
+  getRatios,
+};

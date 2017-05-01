@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+//import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { parseProgram, ProgramEditor } from './program';
-import { convertTo } from './solver';
+import { StepList, convertTo } from './solver';
 import './index.css';
 import '../node_modules/katex/dist/katex.css';
 
@@ -91,31 +91,6 @@ window.onbeforeunload = function(e) {
   saveStateToURL();
 };
 
-let Step = ({step: {what, how, result, view, stepName}}) => (
-  <li className={"step "+stepName}><span style={{color: 'red'}}>({stepName})</span> {what}:
-    <div className="how">{how}</div>
-    Result:&nbsp;
-    {view}
-  </li>
-);
-Step.propTypes = {
-  step: PropTypes.object.isRequired,
-};
-
-let StepList = ({steps, goal}) => (
-  <fieldset className="step-list">
-    <legend>{goal}</legend>
-    <ol>
-      {steps.map((step, idx) => (
-        <Step key={idx} step={step} />
-      ))}
-    </ol>
-  </fieldset>
-);
-StepList.propTypes = {
-  steps: PropTypes.array.isRequired,
-};
-
 const render = () => {
   ReactDOM.render(
     <Provider store={store}>
@@ -133,7 +108,10 @@ const render = () => {
               readOnly />
           </label>
         </div>
-        {store.getState().editor.program && <StepList className="ui-steps" goal="Optimize the tableau" steps={convertTo(store.getState().editor.program, 'tableau')} />}
+        <fieldset className="ui-steps">
+          <legend>Find the optimal solution</legend>
+          {store.getState().editor.program && <StepList steps={convertTo(store.getState().editor.program, 'solution')} />}
+        </fieldset>
       </div>
     </Provider>,
     document.getElementById('root')

@@ -98,6 +98,16 @@ footer {
 	border-left: 1px solid black;
 }
 
+.tableau .row-selected .tableau-cell {
+	background-color: #ccccff;
+}
+.tableau .col-selected.tableau-cell {
+	background-color: #ffcccc;
+}
+.tableau .row-selected .col-selected.tableau-cell {
+	background-color: #ff88ff;
+}
+
 .program {
 	display: block;
 }
